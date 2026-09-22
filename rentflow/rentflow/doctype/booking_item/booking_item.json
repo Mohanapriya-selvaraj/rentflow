@@ -1,0 +1,94 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "creation": "2026-09-22 16:50:24.885942",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "equipment_unit",
+  "category",
+  "daily_rate",
+  "line_days",
+  "line_amount",
+  "checkout_condition_grade",
+  "checkin_condition_grade",
+  "damage_fee"
+ ],
+ "fields": [
+  {
+   "fieldname": "equipment_unit",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Equipment Unit",
+   "options": "Equipment Unit",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "equipment_unit.category",
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Category",
+   "options": "Equipment Category",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "category.daily_rate",
+   "fieldname": "daily_rate",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Daily Rate"
+  },
+  {
+   "fieldname": "line_amount",
+   "fieldtype": "Currency",
+   "label": "Line Amount",
+   "read_only": 1
+  },
+  {
+   "default": "New",
+   "fieldname": "checkout_condition_grade",
+   "fieldtype": "Select",
+   "label": "Checkout Condition Grade",
+   "options": "New\nGood\nFair\nPoor\nDamaged"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "New",
+   "fieldname": "checkin_condition_grade",
+   "fieldtype": "Select",
+   "label": "Checkin Condition Grade",
+   "options": "New\nGood\nFair\nPoor\nDamaged"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "damage_fee",
+   "fieldtype": "Currency",
+   "label": "Damage Fee",
+   "read_only": 1
+  },
+  {
+   "fieldname": "line_days",
+   "fieldtype": "Int",
+   "label": "Line Days",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-09-22 19:28:47.735544",
+ "modified_by": "Administrator",
+ "module": "Rentflow",
+ "name": "Booking Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

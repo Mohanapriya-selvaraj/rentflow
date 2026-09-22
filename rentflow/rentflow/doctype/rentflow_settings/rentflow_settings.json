@@ -1,0 +1,81 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "creation": "2026-09-22 15:58:27.900148",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "shop_name",
+  "manager_email",
+  "default_deposit_percent",
+  "damage_fee__per_grade_drop",
+  "late_fee_per_day",
+  "low_availability_alert_enabled"
+ ],
+ "fields": [
+  {
+   "fieldname": "shop_name",
+   "fieldtype": "Data",
+   "label": "Shop Name"
+  },
+  {
+   "fieldname": "manager_email",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Manager Email",
+   "options": "Phone",
+   "reqd": 1
+  },
+  {
+   "default": "20",
+   "fieldname": "default_deposit_percent",
+   "fieldtype": "Percent",
+   "label": "Default Deposit Percent"
+  },
+  {
+   "default": "500",
+   "fieldname": "damage_fee__per_grade_drop",
+   "fieldtype": "Currency",
+   "label": "Damage Fee  Per Grade Drop"
+  },
+  {
+   "default": "100",
+   "fieldname": "late_fee_per_day",
+   "fieldtype": "Currency",
+   "label": "Late Fee Per Day"
+  },
+  {
+   "default": "1",
+   "fieldname": "low_availability_alert_enabled",
+   "fieldtype": "Check",
+   "label": "Low Availability Alert Enabled"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-09-22 16:11:07.198258",
+ "modified_by": "Administrator",
+ "module": "Rentflow",
+ "name": "Rentflow Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,87 @@
+{
+ "actions": [],
+ "allow_bulk_edit": 1,
+ "allow_rename": 1,
+ "creation": "2026-09-22 15:48:26.706462",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "unit_code",
+  "category",
+  "condition_grade",
+  "current_status",
+  "purchase_value",
+  "is_active"
+ ],
+ "fields": [
+  {
+   "fieldname": "unit_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Unit Code",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "label": "Category",
+   "options": "Equipment Category",
+   "reqd": 1
+  },
+  {
+   "default": "New",
+   "fieldname": "condition_grade",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Condition Grade",
+   "options": "New\nGood\nFair\nPoor\nDamaged"
+  },
+  {
+   "default": "Available",
+   "fieldname": "current_status",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Current Status",
+   "options": "Available\nReserved\nRented\nUnder Repair\nRetired"
+  },
+  {
+   "fieldname": "purchase_value",
+   "fieldtype": "Currency",
+   "label": "Purchase Value"
+  },
+  {
+   "default": "1",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "label": "Is Active"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-09-22 15:57:42.177209",
+ "modified_by": "Administrator",
+ "module": "Rentflow",
+ "name": "Equipment Unit",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
