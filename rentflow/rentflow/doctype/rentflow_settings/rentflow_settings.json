@@ -9,7 +9,7 @@
   "shop_name",
   "manager_email",
   "default_deposit_percent",
-  "damage_fee__per_grade_drop",
+  "damage_fee_per_grade_drop",
   "late_fee_per_day",
   "low_availability_alert_enabled"
  ],
@@ -34,12 +34,6 @@
    "label": "Default Deposit Percent"
   },
   {
-   "default": "500",
-   "fieldname": "damage_fee__per_grade_drop",
-   "fieldtype": "Currency",
-   "label": "Damage Fee  Per Grade Drop"
-  },
-  {
    "default": "100",
    "fieldname": "late_fee_per_day",
    "fieldtype": "Currency",
@@ -50,13 +44,19 @@
    "fieldname": "low_availability_alert_enabled",
    "fieldtype": "Check",
    "label": "Low Availability Alert Enabled"
+  },
+  {
+   "default": "500",
+   "fieldname": "damage_fee_per_grade_drop",
+   "fieldtype": "Currency",
+   "label": "Damage Fee  Per Grade Drop"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-09-22 16:11:07.198258",
+ "modified": "2026-09-23 16:41:55.347848",
  "modified_by": "Administrator",
  "module": "Rentflow",
  "name": "Rentflow Settings",

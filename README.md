@@ -38,3 +38,48 @@ This app can use GitHub Actions for CI. The following workflows are configured:
 ### License
 
 mit
+
+# E1-Complete Lifecycle-On_update:
+        def on_update(self):
+            self.final_amount = self.rental_total + self.damage_total
+            self.save()
+    ->rentflow (app) Calling self.save() inside on_update() causes recursion because save() triggers on_update() again.save() triggers on_update() again.
+
+Incorrect:
+
+    def on_update(self):
+        self.final_amount = self.rental_total + self.damage_total
+        self.save()
+
+The calculation should instead be performed during validate()
+  def validate(self):
+       self.final_amount = self.rental_total + self.damage_total
+
+# E2-Autoname & Renaming
+
+# Autoname
+Equipment Unit overrides autoname() to generate the document name using the first three characters of the category followed by a five-digit naming series.
+
+Example:
+
+Generator -> GEN-00001
+# Renaming
+Yard Staff can be renamed using:
+frappe.rename_doc(
+    "Yard Staff",
+    "STAFF-0001",
+    "STAFF-0005",
+    merge=False
+)
+merge=False performs a normal rename.
+
+merge=True is used to merge the source document into an existing target document. It can affect the target document's existing data,so it should only be used when a merge is intentional.
+
+# E3-One Performance Judgment Call
+
+In on_update, I would use frappe.db.get_value() because only the low_availability_threshold value is required.
+threshold = frappe.db.get_value(
+    "RentFlow Settings",
+    None,
+    "low_availability_threshold"
+)

@@ -5,6 +5,38 @@ app_description = "A custom frappe app for a construction & event equipment rent
 app_email = "mohanapriya969847@gmail.com"
 app_license = "mit"
 
+
+fixtures = [
+    {
+        "dt": "Role",
+        "filters": [
+            ["name", "in", [
+                "RF Front Desk",
+                "RF Inspector",
+                "RF Manager"
+            ]]
+        ]
+    },
+    {   "dt": "Custom DocPerm",
+        "filters": [
+            ["parent", "in", [
+                "Equipment Category",
+                "Yard Staff",
+                "Equipment Unit",
+                "Rental Booking",
+                "Rental Invoice"
+            ]]
+        ] }]
+Permission_query_conditions = {
+   "Rental Booking": "rentflow.rentflow.doctype.rental_booking.rental_booking.get_permission_query_conditions"
+}
+#doc_events = {
+ #   "*": {
+ #       "on_update": "rentflow.audit.log_change",
+  #      "on_submit": "rentflow.audit.log_change",
+  #      "on_cancel": "rentflow.audit.log_change",
+   # }
+#}
 # Apps
 # ------------------
 

@@ -1,15 +1,8 @@
 // Copyright (c) 2026, Mohanapriya S and contributors
 // For license information, please see license.txt
 
-// frappe.ui.form.on("Rental Booking", {
+// frappe.ui.form.on("Wildcard audit Log", {
 // 	refresh(frm) {
 
 // 	},
 // });
-
-frappe.ui.on("Rental Booking",{
-onload(frm){
-    frm.set_query(" ")
-}
-
-})

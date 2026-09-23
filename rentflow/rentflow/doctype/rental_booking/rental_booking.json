@@ -23,6 +23,7 @@
   "rental_total",
   "damage_total",
   "final_amount",
+  "column_break_b1ey",
   "payment_status",
   "status",
   "naming_series",
@@ -38,11 +39,6 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
-  },
-  {
-   "fieldname": "customer_name",
-   "fieldtype": "Data",
-   "label": "Customer Name"
   },
   {
    "fieldname": "customer_phone",
@@ -150,13 +146,22 @@
   {
    "fieldname": "column_break_ddvc",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_b1ey",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-09-22 19:21:07.531089",
+ "modified": "2026-09-23 16:54:21.797286",
  "modified_by": "Administrator",
  "module": "Rentflow",
  "name": "Rental Booking",
