@@ -38,7 +38,61 @@ This app can use GitHub Actions for CI. The following workflows are configured:
 ### License
 
 mit
+## B3 Dangerous Patterns — Document Lifecycle Bugs
 
+### Bug 1: self.save() inside validate()
+
+validate() is already called during the document save process.
+Calling self.save() inside validate() causes recursive save and
+validation calls.
+
+### Bug 2: unit.save() inside validate()
+
+Calling unit.save() inside validate() saves another document during the validation lifecycle. The Equipment Unit status should instead be
+updated in an appropriate lifecycle event such as on_submit().
+
+### Corrected Version
+def validate(self):
+    self.rental_total = sum(r.line_amount for r in self.items)
+
+
+def on_submit(self):
+    for item in self.items:
+        frappe.db.set_value(
+            "Equipment Unit",
+            item.equipment_unit,
+            "current_status",
+            "Rented"
+        )
+# B4 — Optimistic Locking
+
+If two staff members open the same Rental Booking at the same time,
+both initially have the same version of the document.
+
+If Staff A saves the booking first, Frappe updates the document's
+modification timestamp.
+
+When Staff B tries to save the old version, Frappe detects that the
+document was modified after Staff B opened it.
+
+Frappe raises:
+
+"Document has been modified after you have opened it"
+
+This prevents Staff B's old data from silently overwriting Staff A's
+changes.
+# C3-Booking Item & Rental Invoice:
+A test Yard Staff record was renamed using frappe rename_doc().
+Yes, the handled_by field in linked Rental Booking records updates automatically.
+This happens because handled_by is a Link field that references the Yard Staff DocType. When frappe.rename_doc() is used, Frappe updates the linked references to the new document name.
+For example:
+Before rename:
+Yard Staff: STAFF-0001
+Rental Booking handled_by: STAFF-0001
+After rename:
+Yard Staff: STAFF-0099
+Rental Booking handled_by: STAFF-0099
+Therefore, linked Rental Bookings continue to reference the renamed Yard Staff record.
 # E1-Complete Lifecycle-On_update:
         def on_update(self):
             self.final_amount = self.rental_total + self.damage_total
@@ -83,3 +137,28 @@ threshold = frappe.db.get_value(
     None,
     "low_availability_threshold"
 )
+# H2 - Rental Booking form script
+frappe.call is asynchronous, so the validation may continue before the result comes back. Therefore, do the availability check in onload or refresh instead.
+ # I-## SQL Parameterization
+
+#### F-string version
+today = frappe.utils.today()
+query = f"""
+SELECT name, customer_name, end_date, status, handled_by
+FROM `tabRental Booking`
+WHERE status = 'Checked Out'
+AND end_date < '{today}'
+"""
+#### Parameterized version
+today = frappe.utils.today()
+query = """
+SELECT name, customer_name, end_date, status, handled_by
+FROM `tabRental Booking`
+WHERE status = 'Checked Out'
+AND end_date < %(today)s
+"""
+frappe.db.sql(query, {
+    "today": today
+})
+The parameterized version is preferred because the SQL statement and the input values are kept separate. Values are passed as parameters instead of being directly inserted into the SQL string. This provides safer and more consistent handling of query values and avoids constructing SQL with f-strings.
+

@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class WildcardauditLog(Document):
+class WildcardAuditLog(Document):
 	pass

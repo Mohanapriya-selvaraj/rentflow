@@ -27,16 +27,23 @@ fixtures = [
                 "Rental Invoice"
             ]]
         ] }]
-Permission_query_conditions = {
-   "Rental Booking": "rentflow.rentflow.doctype.rental_booking.rental_booking.get_permission_query_conditions"
+doc_events = {
+    "*": {
+        "on_update": "rentflow.audit.log_change",
+        "on_submit": "rentflow.audit.log_change",
+        "on_cancel": "rentflow.audit.log_change",
+    }
 }
-#doc_events = {
- #   "*": {
- #       "on_update": "rentflow.audit.log_change",
-  #      "on_submit": "rentflow.audit.log_change",
-  #      "on_cancel": "rentflow.audit.log_change",
-   # }
+after_install = "rentflow.install.after_install"
+jinja = {
+    "methods": [
+        "rentflow.jinja.get_shop_name"
+    ]
+}
+#Permission_query_conditions = {
+   #"Rental Booking": "rentflow.rentflow.doctype.rental_booking.rental_booking.get_permission_query_conditions"
 #}
+
 # Apps
 # ------------------
 

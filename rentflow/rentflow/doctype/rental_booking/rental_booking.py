@@ -47,7 +47,7 @@ class RentalBooking(Document):
 
             if conflict:
                 frappe.throw(
-                    f"Equipment Unit {item.equipment_unit} is already booked in {conflicts[0].name}"
+                    f"Equipment Unit {item.equipment_unit} is already booked in {conflict[0].name}"
                 )
 
 
@@ -70,7 +70,7 @@ class RentalBooking(Document):
                 getdate(self.end_date) - getdate(self.start_date)
             ).days + 1
 
-            item.line_amount = item.daily_rate * item.line_days
+            item.line_amount = item.daily_rate * item.line_days * item.quantity
             rtotal += item.line_amount
 
             if (
@@ -159,9 +159,14 @@ class RentalBooking(Document):
             invoice = frappe.get_doc("Rental Invoice", invoice_name)
             if invoice.payment_status == "Unpaid" and invoice.docstatus == 1:
                 invoice.cancel()
-    def on_trash(self):
-        if self.status not in ("Cancelled","Draft"):
-            frappe.throw("Only Cancelled or Draft bookings can be deleted")
-    def on_update(self):
-        self.final_amount = self.rental_total + self.damage_total
-    
+        frappe.db.commit()  
+    #def on_trash(self):
+       # if self.status not in ("Cancelled","Draft"):
+            #frappe.throw("Only Cancelled or Draft bookings can be deleted")
+    #def on_update(self):
+       # self.final_amount = self.rental_total + self.damage_total
+    def before_print(self, method=None):
+        self.print_summary = (
+            f"{self.customer_name} - "
+            f"{self.start_date} to {self.end_date}"
+        )

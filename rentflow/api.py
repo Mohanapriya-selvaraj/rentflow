@@ -1,6 +1,7 @@
 import frappe
 import frappe.share
-
+from frappe.query_builder import DocType
+from frappe.utils import today
 
 @frappe.whitelist()
 def share_booking(booking_name, user_email):
@@ -57,3 +58,52 @@ def send_email(bookingid):
         <p>Status: {booking.status}</p>
         """
     )
+@frappe.whitelist()
+def rename_yard_staff(old_name, new_name):
+        return frappe.rename_doc(
+            "Yard Staff",
+            old_name,
+            new_name,
+            merge=False
+        )
+   
+@frappe.whitelist()
+def get_overdue_returns():
+    RB = DocType("Rental Booking")
+
+    result = (
+        frappe.qb
+        .from_(RB)
+        .select(
+            RB.name,
+            RB.customer_name,
+            RB.end_date
+        )
+        .where(
+            (RB.status == "Checked Out")
+            & (RB.end_date < today())
+        )
+        .orderby(RB.end_date)
+        .run(as_dict=True)
+    )
+
+    return result
+@frappe.whitelist()
+def reassign_bookings(from_staff, to_staff):
+    try:
+        frappe.db.sql("""
+            UPDATE `tabRental Booking`
+            SET handled_by = %s
+            WHERE handled_by = %s
+            AND status NOT IN ('Returned', 'Cancelled', 'Closed')
+        """, (to_staff, from_staff))
+
+        frappe.db.commit()
+
+    except Exception:
+        frappe.db.rollback()
+        frappe.log_error(
+            frappe.get_traceback(),
+            "Reassignment Failed"
+        )
+        raise

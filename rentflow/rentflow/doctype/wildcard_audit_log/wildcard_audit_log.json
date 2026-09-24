@@ -2,7 +2,7 @@
  "actions": [],
  "allow_bulk_edit": 1,
  "allow_rename": 1,
- "creation": "2026-09-23 18:44:45.414904",
+ "creation": "2026-09-24 10:45:42.606396",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
@@ -16,7 +16,7 @@
   {
    "fieldname": "doctype_name",
    "fieldtype": "Data",
-   "label": "Doctype Name"
+   "label": "Doctype_name"
   },
   {
    "fieldname": "document_name",
@@ -42,10 +42,10 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-09-23 18:49:05.403410",
+ "modified": "2026-09-24 10:47:39.331136",
  "modified_by": "Administrator",
  "module": "Rentflow",
- "name": "Wildcard audit Log",
+ "name": "Wildcard Audit Log",
  "owner": "Administrator",
  "permissions": [
   {

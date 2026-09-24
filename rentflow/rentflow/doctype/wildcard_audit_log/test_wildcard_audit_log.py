@@ -13,9 +13,9 @@ IGNORE_TEST_RECORD_DEPENDENCIES = []  # eg. ["User"]
 
 
 
-class IntegrationTestWildcardauditLog(IntegrationTestCase):
+class IntegrationTestWildcardAuditLog(IntegrationTestCase):
 	"""
-	Integration tests for WildcardauditLog.
+	Integration tests for WildcardAuditLog.
 	Use this class for testing interactions between multiple components.
 	"""
 
