@@ -4,23 +4,41 @@
 
 
 
- frappe.ui.form.on("Rental Booking", {
-    setup(frm) {
-        frm.set_query("equipment_unit", "items", function(doc, cdt, cdn) {
-            const selected_units = (doc.items || [])
-                .map(row => row.equipment_unit)
-                .filter(Boolean);
+frappe.ui.form.on("Rental Booking", {
+setup(frm) {
+    frm.set_query("equipment_unit", "items", function(doc, cdt, cdn) {
 
+        if (frm.is_new()) {
             return {
-                or_filters: [
-                    ["Equipment Unit", "current_status", "=", "Available"],
-                    ["Equipment Unit", "name", "in", selected_units]
-                ]
+                filters: {
+                    current_status: "Available"
+                }
             };
-        });
-     },
+        }
+        const selected_units = (doc.items || [])
+            .filter(row => row.name !== cdn)
+            .map(row => row.equipment_unit)
+            .filter(Boolean);
+
+        if (!selected_units.length) {
+            return {
+                filters: {
+                    current_status: "Available"
+                }
+            };
+        }
+        return {
+            or_filters: [
+                ["current_status", "=", "Available"],
+                ["name", "in", selected_units]
+            ]
+        };
+    });
+},
  	refresh(frm) {
-        
+        if (!frappe.user.has_role("RF Manager")) {
+       frm.set_df_property("customer_phone", "hidden", 1);
+     }
         const colors = {
             "Draft": "gray",
             "Confirmed": "blue",
@@ -39,13 +57,63 @@
         }
 
         if (frm.doc.status === "Checked Out") {
-        frm.add_custom_button(__("Log Return"), function() {
+         frm.add_custom_button(__("Log Return"), function() {
             show_return_dialog(frm);
         });
     }
-        frm.add_custom_button(__("Transfer Handler"), function() {
-           
+         frm.add_custom_button(__("Transfer Handler"), function() {
+            frappe.prompt(
+            [
+                {
+                    fieldname: "handler",
+                    fieldtype: "Link",
+                    label:"New Handler",
+                    options: "Yard Staff",
+                    reqd: 1
+                }
+            ],
+            function(values) {
+                frappe.confirm(
+                    __("Are you sure you want to transfer this booking to {0}?", [values.handler]),
+                    function() {
+                        frappe.call({
+                            method: "rentflow.api.transfer_handler",
+                            args: {
+                                booking: frm.doc.name,
+                                new_handler: values.handler
+                            },
+                            callback: function(r) {
+                                console.log(r.message);
+                                frm.reload_doc();
+                            }
+                        });
+    }
+                );
+            },
+            __("Transfer Handler"),
+            __("Continue")
+        );
     });
+
+    if (frm.doc.docstatus === 1) {
+        frm.add_custom_button("View Rental Invoice", function () {
+            frappe.db.get_value(
+                "Rental Invoice",
+                { rental_booking: frm.doc.name },
+                "name"
+            ).then(r => {
+                if (r.message && r.message.name) {
+                    frappe.set_route(
+                        "Form",
+                        "Rental Invoice",
+                        r.message.name
+                    );
+                } else {
+                    frappe.msgprint("Rental Invoice not found.");
+                }
+            });
+        });
+    }
  	},
     start_date(frm) {
     check_rental_period(frm);
@@ -54,7 +122,7 @@
     end_date(frm) {
         check_rental_period(frm);
     },
-
+    
     
  });
 
@@ -178,13 +246,13 @@ function calculate_line_amount(frm, cdt, cdn) {
     let row = locals[cdt][cdn];
 
     if (!row.quantity || !row.daily_rate || !row.start_date || !row.end_date) {
-        frappe.trow("Enter the details correctely...")
+        frappe.throw("Enter the details correctely...")
     }
 
     let days = frappe.datetime.get_diff(
         row.end_date,
         row.start_date
-    );
+    )+1;
 
     let amount =row.daily_rate * days * row.quantity;
 

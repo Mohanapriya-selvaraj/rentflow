@@ -7,19 +7,6 @@ from frappe.utils import getdate
 
 
 class RentalBooking(Document):
-    
-    def get_permission_query_conditions(user):
-        if "RF Inspector" in frappe.get_roles(user):
-            return f"""
-                `tabRental Booking`.handled_by IN (
-                    SELECT name
-                    FROM `tabYard Staff`
-                    WHERE user = {frappe.db.escape(user)}
-                )
-            """
-
-        return "" 
-    
     def validate(self):
         
         if getdate(self.start_date) > getdate(self.end_date):
@@ -97,7 +84,7 @@ class RentalBooking(Document):
         if (self.status != "Confirmed"):
             frappe.throw("The Status must be Confirmed before Submission")
 
-        if not self.deposit_collected and self.deposit_collected<=0:
+        if not self.deposit_collected or self.deposit_collected<=0:
             frappe.throw("You  must enter the Deposite collected amount before Submission")
 
         for item in self.items:
@@ -141,6 +128,12 @@ class RentalBooking(Document):
         frappe.enqueue(
             "rentflow.api.send_email",bookingid=self.name
         )
+        
+    def before_print(self):
+        self.print_summary = (
+            f"{self.customer_name} - "
+            f"{self.start_date} to {self.end_date}"
+        )
     def on_cancel(self):
         self.status = "Cancelled"
         for item in self.items:
@@ -159,14 +152,77 @@ class RentalBooking(Document):
             invoice = frappe.get_doc("Rental Invoice", invoice_name)
             if invoice.payment_status == "Unpaid" and invoice.docstatus == 1:
                 invoice.cancel()
-        frappe.db.commit()  
-    #def on_trash(self):
-       # if self.status not in ("Cancelled","Draft"):
-            #frappe.throw("Only Cancelled or Draft bookings can be deleted")
-    #def on_update(self):
-       # self.final_amount = self.rental_total + self.damage_total
-    def before_print(self, method=None):
-        self.print_summary = (
-            f"{self.customer_name} - "
-            f"{self.start_date} to {self.end_date}"
+  
+    def on_trash(self):
+        if self.status not in ("Cancelled","Draft"):
+           frappe.throw("Only Cancelled or Draft bookings can be deleted")
+    def on_update(self):
+        self.final_amount = self.rental_total + self.damage_total
+    def on_update_after_submit(self):
+        rank = {
+            "New": 1,
+            "Good": 2,
+            "Fair": 3,
+            "Poor": 4,
+            "Damaged": 5
+        }
+
+        settings = frappe.get_single("Rentflow Settings")
+        damage_rate = settings.damage_fee_per_grade_drop
+
+        dtotal = 0
+
+        for item in self.items:
+            if (
+                item.checkin_condition_grade
+                and item.checkout_condition_grade
+                and rank[item.checkin_condition_grade]
+                > rank[item.checkout_condition_grade]
+            ):
+                diff = (
+                    rank[item.checkin_condition_grade]
+                    - rank[item.checkout_condition_grade]
+                )
+
+                item.damage_fee = damage_rate * diff
+            else:
+                item.damage_fee = 0
+
+            dtotal += item.damage_fee
+
+        self.damage_total = dtotal
+        self.final_amount = self.rental_total + dtotal
+
+        self.db_update()
+        
+        invoice_name = frappe.db.get_value(
+            "Rental Invoice",
+            {"rental_booking": self.name},
+            "name"
         )
+
+        if invoice_name:
+            frappe.db.set_value(
+                "Rental Invoice",
+                invoice_name,
+                {
+                    "damage_amount": dtotal,
+                    "total_amount": self.final_amount
+                }
+            )
+        invoice = frappe.get_doc("Rental Invoice", invoice_name)
+
+        if self.status == "Invoiced" and invoice.docstatus == 0:
+            invoice.submit()
+            
+def get_permission_query_conditions(user):
+        if "RF Inspector" in frappe.get_roles(user):
+            return f"""
+                `tabRental Booking`.handled_by IN (
+                    SELECT name
+                    FROM `tabYard Staff`
+                    WHERE user = {frappe.db.escape(user)}
+                )
+            """
+
+        return "" 

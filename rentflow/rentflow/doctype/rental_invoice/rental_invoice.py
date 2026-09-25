@@ -11,3 +11,18 @@ class RentalInvoice(Document):
 			"INV-.YYYY.-.#####"
 		)
 		self.name = self.invoice_number
+	def on_update_after_submit(self):
+		if self.payment_status == "Paid":
+			frappe.db.set_value(
+				"Rental Booking",
+				self.rental_booking,
+				"payment_status",
+				"Paid"
+			)
+
+			frappe.db.set_value(
+				"Rental Booking",
+				self.rental_booking,
+				"status",
+				"Closed"
+			)

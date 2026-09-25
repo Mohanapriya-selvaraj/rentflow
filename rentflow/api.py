@@ -2,6 +2,8 @@ import frappe
 import frappe.share
 from frappe.query_builder import DocType
 from frappe.utils import today
+from frappe.utils import now_datetime
+
 
 @frappe.whitelist()
 def share_booking(booking_name, user_email):
@@ -95,7 +97,7 @@ def reassign_bookings(from_staff, to_staff):
             UPDATE `tabRental Booking`
             SET handled_by = %s
             WHERE handled_by = %s
-            AND status NOT IN ('Returned', 'Cancelled', 'Closed')
+            AND status NOT IN ('Returned', 'Cancelled','Invoiced','Closed')
         """, (to_staff, from_staff))
 
         frappe.db.commit()
@@ -107,3 +109,75 @@ def reassign_bookings(from_staff, to_staff):
             "Reassignment Failed"
         )
         raise
+def flag_overdue_returns():
+    last_run = frappe.db.get_value(
+        "Wildcard Audit Log",
+        {
+            "action": "overdue_check",
+            "timestamp": [">=", today()]
+        },
+        "name"
+    )
+
+    if last_run:
+        return
+
+    bookings = frappe.get_all(
+        "Rental Booking",
+        filters={
+            "status": "Checked Out",
+            "end_date": ["<", today()]
+        },
+        fields=["name"]
+    )
+
+    frappe.get_doc({
+        "doctype": "Wildcard Audit Log",
+        "action": "overdue_check",
+        "timestamp": now_datetime()
+    }).insert(ignore_permissions=True)
+
+@frappe.whitelist()
+def get_booking_status():
+    booking_name = frappe.form_dict.get("booking_name")
+
+    if not booking_name:
+        return {"error": "Not found"}
+
+    booking = frappe.db.get_value(
+        "Rental Booking",
+        booking_name,
+        [
+            "name",
+            "status",
+            "start_date",
+            "end_date",
+            "rental_total",
+            "damage_total",
+            "final_amount",
+            "payment_status"
+        ],
+        as_dict=True
+    )
+
+    if not booking:
+        return {"error": "Not found"}
+
+    return {
+        "name": booking.name,
+        "status": booking.status,
+        "start_date": booking.start_date,
+        "end_date": booking.end_date,
+        "rental_total": booking.rental_total,
+        "damage_total": booking.damage_total,
+        "final_amount": booking.final_amount,
+        "payment_status": booking.payment_status
+    }
+
+@frappe.whitelist()
+def transfer_handler(booking, new_handler):
+    doc = frappe.get_doc("Rental Booking", booking)
+    doc.handled_by = new_handler
+    doc.save()
+
+    return "Handler transferred successfully"

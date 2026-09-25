@@ -5,7 +5,11 @@ app_description = "A custom frappe app for a construction & event equipment rent
 app_email = "mohanapriya969847@gmail.com"
 app_license = "mit"
 
-
+scheduler_events = {
+    "daily": [
+        "rentflow.api.flag_overdue_returns"
+    ]
+}
 fixtures = [
     {
         "dt": "Role",
@@ -40,9 +44,11 @@ jinja = {
         "rentflow.jinja.get_shop_name"
     ]
 }
-#Permission_query_conditions = {
-   #"Rental Booking": "rentflow.rentflow.doctype.rental_booking.rental_booking.get_permission_query_conditions"
-#}
+
+permission_query_conditions = {
+    "Rental Booking":
+        "rentflow.rentflow.doctype.rental_booking.rental_booking.get_permission_query_conditions"
+}
 
 # Apps
 # ------------------

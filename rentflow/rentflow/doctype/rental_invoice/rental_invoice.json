@@ -70,6 +70,7 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "payment_status",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -89,7 +90,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-09-24 12:10:20.618279",
+ "modified": "2026-09-25 12:50:21.970924",
  "modified_by": "Administrator",
  "module": "Rentflow",
  "name": "Rental Invoice",

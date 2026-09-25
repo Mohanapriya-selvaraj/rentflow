@@ -62,7 +62,7 @@ def on_submit(self):
             "Equipment Unit",
             item.equipment_unit,
             "current_status",
-            "Rented"
+            "Reserved"
         )
 # B4 — Optimistic Locking
 
@@ -161,4 +161,48 @@ frappe.db.sql(query, {
     "today": today
 })
 The parameterized version is preferred because the SQL statement and the input values are kept separate. Values are passed as parameters instead of being directly inserted into the SQL string. This provides safer and more consistent handling of query values and avoids constructing SQL with f-strings.
+# J -Print Format:
+# Jinja Data Access
 
+We can use frappe.get_all() directly inside the Jinja template to get data from the database. But this puts database logic inside the template.
+Another way is to get the data in before_print() and store it in doc.precomputed_field. Then the Jinja template only displays the data.
+This keeps the database logic in Python and the display logic in the Jinja template.
+# K2 — Spot the N+1
+
+The original code has an N+1 query problem. It first fetches all Rental Bookings, then runs a separate frappe.get_doc() query for each booking to fetch the Yard Staff.
+
+For example, if there are 100 bookings, this can result in 101 database queries.
+
+I fixed this by fetching the booking and staff details together using a SQL JOIN:
+
+result = frappe.db.sql("""
+    SELECT
+        rb.name AS booking_name,
+        ys.staff_name,
+        ys.phone
+    FROM `tabRental Booking` rb
+    LEFT JOIN `tabYard Staff` ys
+        ON ys.name = rb.handled_by
+""", as_dict=True)
+
+for row in result:
+    print(row.staff_name, row.phone)
+# N1-Security,Folded In:
+
+There are 5 uses of ignore_permissions=True
+1. In after_install(), it is used for Equipment Category.insert(ignore_permissions=True) to create the required default Equipment Categories during app installation.
+2. In after_install(), it is used for RentFlow Settings.insert(ignore_permissions=True) to create the required RentFlow Settings during app installation.
+3. In Rental Booking.on_submit(), it is used for Rental Invoice.insert(ignore_permissions=True) to automatically create the Rental Invoice when a booking is submitted.
+4. flag_overdue_returns() uses ignore_permissions=True to create the daily audit record even when the scheduler user does not have permission to create Audit Log records.
+These bypasses are used only for required installation,auto logging and booking operations.
+5.log_change(doc,method)  
+#### JavaScript Field Hiding
+if (
+    !frappe.user.has_role("RF Manager") &&
+    !frappe.user.has_role("Administrator")
+) {
+    frm.set_df_property("customer_phone", "hidden", 1);
+}
+The customer_phone field is hidden for non-managers using JavaScript.
+A direct API call can still retrieve the customer_phone field.
+This shows that JavaScript only hides the field in the UI. It does not provide security. Actual security must be handled using server-side permissions.

@@ -6,17 +6,5 @@ from frappe.model.document import Document
 
 
 class EquipmentUnit(Document):
-	def autoname(self):
-		self.name=frappe.model.naming.make_autoname(f"{self.category[:3].upper()}-.#####")  
-
-
-
-	  #def autoname(self):
-      #  prefix = self.category[:3].upper()
-
-        #i = 1
-
-       # while frappe.db.exists("Equipment Unit", f"{prefix}-{i:05d}"):
-            #i += 1
-
-       # self.name = f"{prefix}-{i:05d}"
+  def autoname(self):
+    self.name=frappe.model.naming.make_autoname(f"{self.category[:3].upper()}-.#####")  

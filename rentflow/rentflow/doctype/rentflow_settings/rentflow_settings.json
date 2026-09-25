@@ -24,7 +24,7 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Manager Email",
-   "options": "Phone",
+   "options": "Email",
    "reqd": 1
   },
   {
@@ -56,7 +56,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-09-23 16:41:55.347848",
+ "modified": "2026-09-24 21:48:24.473476",
  "modified_by": "Administrator",
  "module": "Rentflow",
  "name": "Rentflow Settings",
